@@ -34,6 +34,13 @@ module.exports = function (router, done) {
         });
     });
 
+    router.post('/:id',
+      serandi.json,
+      serandi.transit({
+          workflow: 'model',
+          model: Contacts
+      }));
+
     router.get('/:id',
       serandi.findOne(Contacts),
       function (req, res, next) {

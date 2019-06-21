@@ -189,7 +189,6 @@ describe('GET /contacts', function () {
         });
     });
 
-
     it('can be accessed by anyone when public', function (done) {
         request({
             uri: pot.resolve('accounts', '/apis/v/contacts'),
@@ -240,25 +239,10 @@ describe('GET /contacts', function () {
                     should.exist(b.code);
                     should.exist(b.message);
                     b.code.should.equal(errors.notFound().data.code);
-                    contact.permissions.push({
-                        group: groups.public.id,
-                        actions: ['read']
-                    });
-                    contact.visibility['*'].groups.push(groups.public.id);
-                    request({
-                        uri: pot.resolve('accounts', '/apis/v/contacts/' + contact.id),
-                        method: 'PUT',
-                        auth: {
-                            bearer: client.users[0].token
-                        },
-                        json: contact
-                    }, function (e, r, b) {
-                        if (e) {
-                            return done(e);
+                    pot.publish('accounts', 'contacts', contact.id, client.users[0].token, client.admin.token, function (err) {
+                        if (err) {
+                            return done(err);
                         }
-                        r.statusCode.should.equal(200);
-                        should.exist(b);
-                        validateContacts([b]);
                         request({
                             uri: pot.resolve('accounts', '/apis/v/contacts/' + contact.id),
                             method: 'GET',
