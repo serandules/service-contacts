@@ -19,9 +19,6 @@ module.exports = function (router, done) {
     router.use(throttle.apis('contacts'));
     router.use(bodyParser.json());
 
-    /**
-     * {"name": "serandives app"}
-     */
     router.post('/',
       serandi.json,
       serandi.create(Contacts),
@@ -64,9 +61,6 @@ module.exports = function (router, done) {
         });
     });
 
-    /**
-     * /contacts?data={}
-     */
     router.get('/',
       serandi.find(Contacts),
       function (req, res, next) {
