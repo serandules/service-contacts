@@ -50,7 +50,7 @@ describe('GET /contacts', function () {
             should.exist(contact.id);
             should.exist(contact.user);
             should.exist(contact.createdAt);
-            should.exist(contact.updatedAt);
+            should.exist(contact.modifiedAt);
             should.not.exist(contact._id);
             should.not.exist(contact.__v);
         });
