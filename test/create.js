@@ -20,9 +20,7 @@ describe('POST /contacts', function () {
     var data = {
         name: 'Primary',
         email: 'user@serandives.com',
-        phones: ['+94000000000'],
-        viber: '+94000000000',
-        whatsapp: '+94000000000',
+        phone: '+94000000000',
         messenger: 'user-serandives',
         skype: 'user-serandives'
     };
@@ -138,10 +136,8 @@ describe('POST /contacts', function () {
     }
     var invalidFields = {
         name: [bigger],
-        phones: [bigger],
+        phone: [bigger],
         email: [bigger],
-        viber: [bigger],
-        whatsapp: [bigger],
         messenger: [bigger],
         skype: [bigger]
     };
@@ -186,8 +182,8 @@ describe('POST /contacts', function () {
             }
             r.statusCode.should.equal(201);
             should.exist(b);
-            should.exist(b.viber);
-            b.viber.should.equal(data.viber);
+            should.exist(b.email);
+            b.email.should.equal(data.email);
             should.exist(r.headers['location']);
             r.headers['location'].should.equal(pot.resolve('accounts', '/apis/v/contacts/' + b.id));
             done();

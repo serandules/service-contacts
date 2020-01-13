@@ -7,6 +7,13 @@ var serandi = require('serandi');
 var model = require('model');
 var Contacts = require('model-contacts');
 
+var xactions = {
+    post: {
+        verify: require('./xactions/verify'),
+        confirm: require('./xactions/confirm')
+    }
+};
+
 module.exports = function (router, done) {
     router.use(serandi.many);
     router.use(serandi.ctx);
@@ -32,6 +39,7 @@ module.exports = function (router, done) {
     });
 
     router.post('/:id',
+      serandi.xactions(xactions.post),
       serandi.json,
       serandi.transit({
           workflow: 'model',

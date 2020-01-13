@@ -1,4 +1,5 @@
 var log = require('logger')('service-contacts:test:find');
+var mongoose = require('mongoose');
 var async = require('async');
 var errors = require('errors');
 var _ = require('lodash');
@@ -9,6 +10,8 @@ var pot = require('pot');
 describe('GET /contacts', function () {
     var client;
     var groups;
+    var userEmail = 'test@serandives.com';
+
     before(function (done) {
         pot.drop('contacts', function (err) {
             if (err) {
@@ -37,10 +40,8 @@ describe('GET /contacts', function () {
 
     var contact = {
         name: 'Primary',
-        email: 'user@serandives.com',
-        phones: ['+94000000000'],
-        viber: '+94000000000',
-        whatsapp: '+94000000000',
+        email: userEmail,
+        phone: '+94775493444',
         messenger: 'user-serandives',
         skype: 'user-serandives'
     };
@@ -86,7 +87,7 @@ describe('GET /contacts', function () {
                 should.exist(b);
                 should.exist(b.id);
                 should.exist(b.email);
-                b.email.should.equal('user@serandives.com');
+                b.email.should.equal(userEmail);
                 should.exist(r.headers['location']);
                 r.headers['location'].should.equal(pot.resolve('accounts', '/apis/v/contacts/' + b.id));
                 created();
@@ -239,39 +240,97 @@ describe('GET /contacts', function () {
                     should.exist(b.code);
                     should.exist(b.message);
                     b.code.should.equal(errors.notFound().data.code);
-                    pot.publish('accounts', 'contacts', contact.id, client.users[0].token, client.admin.token, function (err) {
-                        if (err) {
-                            return done(err);
+                    request({
+                        uri: pot.resolve('accounts', '/apis/v/contacts/' + contact.id),
+                        method: 'POST',
+                        headers: {
+                            'X-Action': 'verify',
+                            'X-Captcha': 'dummy'
+                        },
+                        auth: {
+                            bearer: client.users[0].token
+                        },
+                        json: {
+                            email: true
                         }
-                        request({
-                            uri: pot.resolve('accounts', '/apis/v/contacts/' + contact.id),
-                            method: 'GET',
-                            auth: {
-                                bearer: client.users[1].token
-                            },
-                            json: true
-                        }, function (e, r, b) {
-                            if (e) {
-                                return done(e);
+                    }, function (e, r, b) {
+                        if (e) {
+                            return done(e);
+                        }
+                        r.statusCode.should.equal(204);
+                        var Otps = mongoose.model('otps');
+                        Otps.findOne({
+                            user: client.users[0].profile.id,
+                            name: 'contacts-verify',
+                            for: contact.email
+                        }, function (err, otpEmail) {
+                            if (err) {
+                                return done(err);
                             }
-                            r.statusCode.should.equal(200);
-                            should.exist(b);
-                            validateContacts([b]);
-                            request({
-                                uri: pot.resolve('accounts', '/apis/v/contacts/' + contact.id),
-                                method: 'GET',
-                                auth: {
-                                    bearer: client.users[2].token
-                                },
-                                json: true
-                            }, function (e, r, b) {
-                                if (e) {
-                                    return done(e);
+                            Otps.findOne({
+                                user: client.users[0].profile.id,
+                                name: 'contacts-verify',
+                                for: contact.email
+                            }, function (err, otpPhone) {
+                                if (err) {
+                                    return done(err);
                                 }
-                                r.statusCode.should.equal(200);
-                                should.exist(b);
-                                validateContacts([b]);
-                                done();
+                                request({
+                                    uri: pot.resolve('accounts', '/apis/v/contacts/' + contact.id),
+                                    method: 'POST',
+                                    headers: {
+                                        'X-Action': 'confirm',
+                                        'X-Captcha': 'dummy'
+                                    },
+                                    auth: {
+                                        bearer: client.users[0].token
+                                    },
+                                    json: {
+                                        email: otpEmail.weak,
+                                        phone: otpPhone.weak
+                                    }
+                                }, function (e, r, b) {
+                                    if (e) {
+                                        return done(e);
+                                    }
+                                    r.statusCode.should.equal(204);
+                                    pot.publish('accounts', 'contacts', contact.id, client.users[0].token, client.admin.token, function (err) {
+                                        if (err) {
+                                            return done(err);
+                                        }
+                                        request({
+                                            uri: pot.resolve('accounts', '/apis/v/contacts/' + contact.id),
+                                            method: 'GET',
+                                            auth: {
+                                                bearer: client.users[1].token
+                                            },
+                                            json: true
+                                        }, function (e, r, b) {
+                                            if (e) {
+                                                return done(e);
+                                            }
+                                            r.statusCode.should.equal(200);
+                                            should.exist(b);
+                                            validateContacts([b]);
+                                            request({
+                                                uri: pot.resolve('accounts', '/apis/v/contacts/' + contact.id),
+                                                method: 'GET',
+                                                auth: {
+                                                    bearer: client.users[2].token
+                                                },
+                                                json: true
+                                            }, function (e, r, b) {
+                                                if (e) {
+                                                    return done(e);
+                                                }
+                                                r.statusCode.should.equal(200);
+                                                should.exist(b);
+                                                validateContacts([b]);
+                                                done();
+                                            });
+                                        });
+                                    });
+                                });
                             });
                         });
                     });
