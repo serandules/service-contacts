@@ -294,29 +294,27 @@ describe('GET /contacts', function () {
                                         return done(e);
                                     }
                                     r.statusCode.should.equal(204);
-                                    pot.publish('accounts', 'contacts', contact.id, client.users[0].token, client.admin.token, function (err) {
-                                        if (err) {
-                                            return done(err);
+                                    request({
+                                        uri: pot.resolve('accounts', '/apis/v/contacts/' + contact.id),
+                                        method: 'PUT',
+                                        auth: {
+                                            bearer: client.users[0].token
+                                        },
+                                        json: contact
+                                    }, function (e, r, b) {
+                                        if (e) {
+                                            return done(e);
                                         }
-                                        request({
-                                            uri: pot.resolve('accounts', '/apis/v/contacts/' + contact.id),
-                                            method: 'GET',
-                                            auth: {
-                                                bearer: client.users[1].token
-                                            },
-                                            json: true
-                                        }, function (e, r, b) {
-                                            if (e) {
-                                                return done(e);
+                                        r.statusCode.should.equal(200);
+                                        pot.publish('accounts', 'contacts', contact.id, client.users[0].token, client.admin.token, function (err) {
+                                            if (err) {
+                                                return done(err);
                                             }
-                                            r.statusCode.should.equal(200);
-                                            should.exist(b);
-                                            validateContacts([b]);
                                             request({
                                                 uri: pot.resolve('accounts', '/apis/v/contacts/' + contact.id),
                                                 method: 'GET',
                                                 auth: {
-                                                    bearer: client.users[2].token
+                                                    bearer: client.users[1].token
                                                 },
                                                 json: true
                                             }, function (e, r, b) {
@@ -326,7 +324,22 @@ describe('GET /contacts', function () {
                                                 r.statusCode.should.equal(200);
                                                 should.exist(b);
                                                 validateContacts([b]);
-                                                done();
+                                                request({
+                                                    uri: pot.resolve('accounts', '/apis/v/contacts/' + contact.id),
+                                                    method: 'GET',
+                                                    auth: {
+                                                        bearer: client.users[2].token
+                                                    },
+                                                    json: true
+                                                }, function (e, r, b) {
+                                                    if (e) {
+                                                        return done(e);
+                                                    }
+                                                    r.statusCode.should.equal(200);
+                                                    should.exist(b);
+                                                    validateContacts([b]);
+                                                    done();
+                                                });
                                             });
                                         });
                                     });

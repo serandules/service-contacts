@@ -58,8 +58,9 @@ var verifyEmail = function (user, contact, done) {
         }
         var ctx = {
           user: user,
-          title: 'Verify your email',
-          reset: utils.resolve(util.format('accounts:///verify?user=%s&email=%s&otp=%s', user.id, email, otp.strong))
+          email: email,
+          title: 'Your contact email verification code',
+          code: otp.weak
         };
         dust.render('service-contacts-verify', ctx, function (err, html) {
           if (err) {
@@ -134,7 +135,7 @@ var verifyPhone = function (user, contact, done) {
 
 module.exports = function (route) {
   route.use(serandi.json);
-  route.use(serandi.captcha);
+  // route.use(serandi.captcha);
 
   route.use(serandi.findOne(Contacts));
 

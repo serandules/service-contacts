@@ -29,7 +29,7 @@ var confirmEmail = function (user, contact, data, done) {
       return done(err);
     }
     if (!otp) {
-      return done(errors.unauthorized());
+      return done(errors.forbidden());
     }
     Contacts.update({_id: contact.id}, {
       '_.verified.email': true
@@ -57,7 +57,7 @@ var confirmPhone = function (user, contact, data, done) {
       return done(err);
     }
     if (!otp) {
-      return done(errors.unauthorized());
+      return done(errors.forbidden());
     }
     Contacts.update({_id: contact.id}, {
       '_.verified.phone': true
