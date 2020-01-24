@@ -67,8 +67,6 @@ var confirmPhone = function (user, contact, data, done) {
 
 module.exports = function (route) {
   route.use(serandi.json);
-  route.use(serandi.captcha);
-
   route.use(serandi.findOne(Contacts));
 
   route.use(function (req, res, next) {
