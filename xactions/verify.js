@@ -1,3 +1,4 @@
+var nconf = require('nconf');
 var async = require('async');
 var fs = require('fs');
 var path = require('path');
@@ -14,6 +15,8 @@ var Contacts = require('model-contacts');
 var Otps = require('model-otps');
 
 var sns = utils.sns();
+
+var smsSender = nconf.get('SMS_SENDER');
 
 var template = function (name) {
   var data = fs.readFileSync(path.join(__dirname, '..', 'templates', name + '.html'));
@@ -113,20 +116,11 @@ var verifyPhone = function (user, contact, done) {
         if (err) {
           return done(err);
         }
-        sns.checkIfPhoneNumberIsOptedOut({
-          phoneNumber: phone
-        }, function (err, data) {
-          if (err) {
-            return done(err);
-          }
-          if (data.isOptedOut) {
-            return done(errors.forbidden());
-          }
-          sns.publish({
-            PhoneNumber: phone,
-            Message: util.format('%s is your %s verification code.', otp.weak, utils.domain())
-          }, done);
-        });
+        messenger.sms({
+          phone: phone,
+          sender: smsSender,
+          message: util.format('%s is your %s verification code.', otp.weak, utils.domain())
+        }, done);
       });
     });
   });
