@@ -41,7 +41,7 @@ describe('GET /contacts', function () {
     var contact = {
         name: 'Primary',
         email: userEmail,
-        phone: '+94775493444',
+        phone: '+94768006004',
         messenger: 'user-serandives',
         skype: 'user-serandives'
     };
