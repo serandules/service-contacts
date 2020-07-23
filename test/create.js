@@ -42,7 +42,7 @@ describe('POST /contacts', function () {
 
     it('with no media type', function (done) {
         request({
-            uri: pot.resolve('accounts', '/apis/v/contacts'),
+            uri: pot.resolve('apis', '/v/contacts'),
             method: 'POST',
             auth: {
                 bearer: client.users[0].token
@@ -63,7 +63,7 @@ describe('POST /contacts', function () {
 
     it('with unsupported media type', function (done) {
         request({
-            uri: pot.resolve('accounts', '/apis/v/contacts'),
+            uri: pot.resolve('apis', '/v/contacts'),
             method: 'POST',
             headers: {
                 'Content-Type': 'application/xml'
@@ -87,7 +87,7 @@ describe('POST /contacts', function () {
 
     it('without name', function (done) {
       request({
-        uri: pot.resolve('accounts', '/apis/v/contacts'),
+        uri: pot.resolve('apis', '/v/contacts'),
         method: 'POST',
         json: without(['name']),
         auth: {
@@ -108,7 +108,7 @@ describe('POST /contacts', function () {
 
     it('without any', function (done) {
       request({
-        uri: pot.resolve('accounts', '/apis/v/contacts'),
+        uri: pot.resolve('apis', '/v/contacts'),
         method: 'POST',
         json: {
           name: 'primary'
@@ -147,7 +147,7 @@ describe('POST /contacts', function () {
         values.forEach(function (value, i) {
             it('invalid ' + field + ' with value ' + i, function (done) {
                 request({
-                    uri: pot.resolve('accounts', '/apis/v/contacts'),
+                    uri: pot.resolve('apis', '/v/contacts'),
                     method: 'POST',
                     json: invalid(field, value),
                     auth: {
@@ -170,7 +170,7 @@ describe('POST /contacts', function () {
 
     it('valid', function (done) {
         request({
-            uri: pot.resolve('accounts', '/apis/v/contacts'),
+            uri: pot.resolve('apis', '/v/contacts'),
             method: 'POST',
             json: data,
             auth: {
@@ -185,7 +185,7 @@ describe('POST /contacts', function () {
             should.exist(b.email);
             b.email.should.equal(data.email);
             should.exist(r.headers['location']);
-            r.headers['location'].should.equal(pot.resolve('accounts', '/apis/v/contacts/' + b.id));
+            r.headers['location'].should.equal(pot.resolve('apis', '/v/contacts/' + b.id));
             done();
         });
     });

@@ -39,6 +39,7 @@ module.exports = function (router, done) {
     });
 
     router.post('/:id',
+      serandi.id,
       serandi.xactions(xactions.post),
       serandi.json,
       serandi.transit({
@@ -47,6 +48,7 @@ module.exports = function (router, done) {
       }));
 
     router.get('/:id',
+      serandi.id,
       serandi.findOne(Contacts),
       function (req, res, next) {
         model.findOne(req.ctx, function (err, location) {
@@ -58,6 +60,7 @@ module.exports = function (router, done) {
     });
 
     router.put('/:id',
+      serandi.id,
       serandi.json,
       serandi.update(Contacts),
       function (req, res, next) {
@@ -81,6 +84,7 @@ module.exports = function (router, done) {
     });
 
     router.delete('/:id',
+      serandi.id,
       serandi.remove(Contacts),
       function (req, res, next) {
         model.remove(req.ctx, function (err) {

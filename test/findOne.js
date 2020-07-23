@@ -73,7 +73,7 @@ describe('GET /contacts', function () {
             var contact = payload();
             contact.viber = 'viber' + count;
             request({
-                uri: pot.resolve('accounts', '/apis/v/contacts'),
+                uri: pot.resolve('apis', '/v/contacts'),
                 method: 'POST',
                 auth: {
                     bearer: user.token
@@ -89,7 +89,7 @@ describe('GET /contacts', function () {
                 should.exist(b.email);
                 b.email.should.equal(userEmail);
                 should.exist(r.headers['location']);
-                r.headers['location'].should.equal(pot.resolve('accounts', '/apis/v/contacts/' + b.id));
+                r.headers['location'].should.equal(pot.resolve('apis', '/v/contacts/' + b.id));
                 created();
             });
         }, done);
@@ -97,7 +97,7 @@ describe('GET /contacts', function () {
 
     it('invalid id', function (done) {
         request({
-            uri: pot.resolve('accounts', '/apis/v/contacts/undefined'),
+            uri: pot.resolve('apis', '/v/contacts/undefined'),
             method: 'GET',
             auth: {
                 bearer: client.users[0].token
@@ -118,7 +118,7 @@ describe('GET /contacts', function () {
 
     it('owner can access', function (done) {
         request({
-            uri: pot.resolve('accounts', '/apis/v/contacts'),
+            uri: pot.resolve('apis', '/v/contacts'),
             method: 'GET',
             auth: {
                 bearer: client.users[0].token
@@ -134,7 +134,7 @@ describe('GET /contacts', function () {
             b.length.should.equal(1);
             validateContacts(b);
             request({
-                uri: pot.resolve('accounts', '/apis/v/contacts/' + b[0].id),
+                uri: pot.resolve('apis', '/v/contacts/' + b[0].id),
                 method: 'GET',
                 auth: {
                     bearer: client.users[0].token
@@ -154,7 +154,7 @@ describe('GET /contacts', function () {
 
     it('others cannot access', function (done) {
         request({
-            uri: pot.resolve('accounts', '/apis/v/contacts'),
+            uri: pot.resolve('apis', '/v/contacts'),
             method: 'GET',
             auth: {
                 bearer: client.users[0].token
@@ -170,7 +170,7 @@ describe('GET /contacts', function () {
             b.length.should.equal(1);
             validateContacts(b);
             request({
-                uri: pot.resolve('accounts', '/apis/v/contacts/' + b[0].id),
+                uri: pot.resolve('apis', '/v/contacts/' + b[0].id),
                 method: 'GET',
                 auth: {
                     bearer: client.users[1].token
@@ -192,7 +192,7 @@ describe('GET /contacts', function () {
 
     it('can be accessed by anyone when public', function (done) {
         request({
-            uri: pot.resolve('accounts', '/apis/v/contacts'),
+            uri: pot.resolve('apis', '/v/contacts'),
             method: 'GET',
             auth: {
                 bearer: client.users[0].token
@@ -209,7 +209,7 @@ describe('GET /contacts', function () {
             validateContacts(b);
             var contact = b[0];
             request({
-                uri: pot.resolve('accounts', '/apis/v/contacts/' + contact.id),
+                uri: pot.resolve('apis', '/v/contacts/' + contact.id),
                 method: 'GET',
                 auth: {
                     bearer: client.users[1].token
@@ -225,7 +225,7 @@ describe('GET /contacts', function () {
                 should.exist(b.message);
                 b.code.should.equal(errors.notFound().data.code);
                 request({
-                    uri: pot.resolve('accounts', '/apis/v/contacts/' + contact.id),
+                    uri: pot.resolve('apis', '/v/contacts/' + contact.id),
                     method: 'GET',
                     auth: {
                         bearer: client.users[1].token
@@ -241,7 +241,7 @@ describe('GET /contacts', function () {
                     should.exist(b.message);
                     b.code.should.equal(errors.notFound().data.code);
                     request({
-                        uri: pot.resolve('accounts', '/apis/v/contacts/' + contact.id),
+                        uri: pot.resolve('apis', '/v/contacts/' + contact.id),
                         method: 'POST',
                         headers: {
                             'X-Action': 'verify',
@@ -276,7 +276,7 @@ describe('GET /contacts', function () {
                                     return done(err);
                                 }
                                 request({
-                                    uri: pot.resolve('accounts', '/apis/v/contacts/' + contact.id),
+                                    uri: pot.resolve('apis', '/v/contacts/' + contact.id),
                                     method: 'POST',
                                     headers: {
                                         'X-Action': 'confirm',
@@ -295,7 +295,7 @@ describe('GET /contacts', function () {
                                     }
                                     r.statusCode.should.equal(204);
                                     request({
-                                        uri: pot.resolve('accounts', '/apis/v/contacts/' + contact.id),
+                                        uri: pot.resolve('apis', '/v/contacts/' + contact.id),
                                         method: 'PUT',
                                         auth: {
                                             bearer: client.users[0].token
@@ -306,12 +306,12 @@ describe('GET /contacts', function () {
                                             return done(e);
                                         }
                                         r.statusCode.should.equal(200);
-                                        pot.publish('accounts', 'contacts', contact.id, client.users[0].token, client.admin.token, function (err) {
+                                        pot.publish('contacts', contact.id, client.users[0].token, client.admin.token, function (err) {
                                             if (err) {
                                                 return done(err);
                                             }
                                             request({
-                                                uri: pot.resolve('accounts', '/apis/v/contacts/' + contact.id),
+                                                uri: pot.resolve('apis', '/v/contacts/' + contact.id),
                                                 method: 'GET',
                                                 auth: {
                                                     bearer: client.users[1].token
@@ -325,7 +325,7 @@ describe('GET /contacts', function () {
                                                 should.exist(b);
                                                 validateContacts([b]);
                                                 request({
-                                                    uri: pot.resolve('accounts', '/apis/v/contacts/' + contact.id),
+                                                    uri: pot.resolve('apis', '/v/contacts/' + contact.id),
                                                     method: 'GET',
                                                     auth: {
                                                         bearer: client.users[2].token
